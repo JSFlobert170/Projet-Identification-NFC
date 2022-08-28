@@ -6,9 +6,6 @@
 #define PN532_IRQ   (2)
 #define PN532_RESET (3)  // Not connected by default on the NFC Shield
 
-#define capacity 7
-uint8_t enreg[capacity];
-uint8_t enregLength = 0;
 // Or use this line for a breakout or shield with an I2C connection:
 Adafruit_PN532 nfc(PN532_IRQ, PN532_RESET);
 
@@ -27,6 +24,10 @@ void setup(void) {
 
 
 void loop(void) {
+  }
+
+
+void fonctionTag(){
 
   uint8_t success;                          // Flag to check if there was an error with the PN532
   uint8_t uid[] = { 0, 0, 0, 0, 0, 0, 0 };  // Buffer to store the returned UID
@@ -34,46 +35,39 @@ void loop(void) {
 
   success = nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, uid, &uidLength);
 
-
-
   if (success) {
-
     // Display some basic information about the card
     Serial.print("  UID Value: ");
     nfc.PrintHex(uid, uidLength);
     Serial.println();
 
-
-    if (enregLength == 0)
+    if (uidLength == 4)
     {
       // Code ajoute
-      //uint8_t ref[] = {0x09, 0xC0, 0x67, 0x9F, 0x00, 0x00, 0x00};
-      bool identication = true;
+      uint8_t ref[] = {0x09, 0xC0, 0x67, 0x9F, 0x00, 0x00, 0x00};
+      bool ok = true;
       uint8_t i = 0;
 
 
-      for (int i = 0; i < uidLength; i++)
-        enreg[i] = uid[i];
-        eneregLength = uidLength;
-
-      else {
-        for (i = 0; i < eneregLength; i++) {
-          if (enreg[i] != uid[i])
-            identification = false;
-        }
+      for (i = 0; i < uidLength; i++) {
+        if (ref[i] != uid[i])
+          ok = false;
       }
 
-      if (identification)
+      if (ok)
         Serial.println("===============   OK    =================");
+        
       else
         Serial.println("==============  NOT OK  ================");
+        
 
     }
 
-
     Serial.println();
     Serial.println();
-    delay(1000);
+    delay(900);
+  }
+  Serial.flush();
+  
   }
 
-}
